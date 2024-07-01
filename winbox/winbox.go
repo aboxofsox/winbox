@@ -28,13 +28,13 @@ type Configuration struct {
 }
 
 type MappedFolder struct {
-	HostFolder    string `xml:"HostFolder"`
-	SandboxFolder string `xml:"SandboxFolder"`
-	ReadOnly      bool   `xml:"ReadOnly"`
+	HostFolder    string `xml:"HostFolder" json:"hostFolder"`
+	SandboxFolder string `xml:"SandboxFolder" json:"sandboxFolder"`
+	ReadOnly      bool   `xml:"ReadOnly" json:"readOnly"`
 }
 
 type Command struct {
-	Command string `xml:",chardata"`
+	Command string `xml:",chardata" json:"command"`
 }
 
 const Ext = ".wsb"
