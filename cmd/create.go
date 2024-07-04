@@ -23,6 +23,14 @@ var create = &cobra.Command{
 		c.ClipboardRedirection, _ = cmd.Flags().GetString("clipboard")
 		c.MemoryInMB, _ = cmd.Flags().GetInt("memory")
 
+		if _, err := os.Stat("config.json"); !os.IsNotExist(err) {
+			config, err := winbox.LoadWinboxConfig()
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			winbox.WindowsSandboxPath = config.WindowsSandboxPath
+		}
 		name, _ := cmd.Flags().GetString("name")
 		f, err := os.Create(name + winbox.Ext)
 		if err != nil {

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 
 	"github.com/aboxofsox/winbox/winbox"
@@ -21,6 +22,18 @@ var runCmd = &cobra.Command{
 				return
 			}
 		} else {
+			if _, err := os.Stat("config.json"); !os.IsNotExist(err) {
+				c, err := winbox.LoadWinboxConfig()
+				if err != nil {
+					fmt.Println(err.Error())
+					return
+				}
+				winbox.WindowsSandboxPath = c.WindowsSandboxPath
+			}
+			if _, err := os.Stat(winbox.WindowsSandboxPath); os.IsNotExist(err) {
+				fmt.Println("Windows Sandbox not found at", winbox.WindowsSandboxPath)
+				return
+			}
 			cmd := exec.Command("cmd", "/c", "start", winbox.WindowsSandboxPath)
 			if err := cmd.Run(); err != nil {
 				fmt.Println(err)

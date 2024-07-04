@@ -2,9 +2,26 @@
 
 A small tool to manage [Windows Sandbox]('https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-overview') configurations.
 
+## Prerequisites
+This tool assumes you have installed Windows Sandbox in it's default directory. You can create a `config.json` file in the same directory as the `winbox` executable if you have it installed elsewhere, somehow.
+
+**Windows Sandbox is not available for Windows Home**
+
+To enable Windows Sandbox:
+```powershell
+Enable-WindowsOptionalFeature -FeatureName 'Containers-DisposableClientVM' -All -Online
+```
+
+## Example `config.json`
+```json
+{
+        "windowsSandboxPath": "D:\\Path\\To\\WindowsSandbox.exe"
+}	
+```
+
 ## Basic Usage
 
-```shell
+```
 A small tool to manage Windows Sandbox configurations.
 
 Usage:
@@ -17,12 +34,14 @@ Available Commands:
   help        Help about any command
   map         Map a folder from the host to Windows Sandbox
   run         Run a Windows Sandbox configuration
+  select      Select a Windows Sandbox configuration
 
 Flags:
   -h, --help     help for winbox
   -t, --toggle   Help message for toggle
 
 Use "winbox [command] --help" for more information about a command.
+
 
 ```
 
@@ -114,3 +133,7 @@ Flags:
 ```powershell
 winbox run -N default
 ```
+
+## `select`
+`select` will open a TUI menu where you can select which Windows Sandbox configuration to use and launches Windows Sandbox.
+
