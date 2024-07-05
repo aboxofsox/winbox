@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 )
 
 type Config struct {
@@ -106,6 +107,39 @@ func (c *Configuration) WriteJSON(w io.Writer) error {
 	return enc.Encode(c)
 }
 
+func (c *Configuration) Keys() []string {
+	var keys []string
+	mp := make(map[string]any)
+	b, err := c.JSON()
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil
+	}
+
+	if err := json.Unmarshal(b, &mp); err != nil {
+		fmt.Println(err.Error())
+		return nil
+	}
+
+	for k := range mp {
+		if k == "mappedFolders" || k == "logonCommand" {
+			continue
+		}
+		keys = append(keys, k)
+	}
+
+	sort.Strings(keys)
+	keys = prepend(keys, "name")
+
+	return keys
+}
+
+func prepend(s []string, v string) []string {
+	n := make([]string, 1, len(s)+1)
+	n[0] = v
+	return append(n, s...)
+}
+
 // JSON converts the configuration to JSON
 func (c *Configuration) JSON() ([]byte, error) {
 	return json.Marshal(c)
@@ -141,6 +175,7 @@ func DecodeXML(r io.Reader) (*Configuration, error) {
 	return c, nil
 }
 
+// Run starts Windows Sandbox with the specified configuration
 func Run(name string) error {
 	cmd := exec.Command("cmd", "/c", "start", name+Ext)
 	return cmd.Run()
