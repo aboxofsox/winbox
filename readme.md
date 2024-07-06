@@ -12,12 +12,18 @@ To enable Windows Sandbox:
 Enable-WindowsOptionalFeature -FeatureName 'Containers-DisposableClientVM' -All -Online
 ```
 
-## Example `config.json`
+### Example `config.json`
 ```json
 {
         "windowsSandboxPath": "D:\\Path\\To\\WindowsSandbox.exe"
 }	
 ```
+
+## Installing
+If you have Go, you can simply do `go install github.com/aboxofsox/winbox`.
+
+Otherwise, you will need to download a release, and place it somewhere on your PC. Ideally it would go somewhere that's mapped to `PATH`. 
+
 
 ## Basic Usage
 
@@ -48,7 +54,7 @@ Use "winbox [command] --help" for more information about a command.
 ## `create`
 
 ```powershell
-Create a new Windows Sandbox configuration file
+Create a new Windows Sandbox Configuration
 
 Usage:
   winbox create [flags]
@@ -62,9 +68,12 @@ Flags:
   -n, --networking string   Networking configuration (default "Default")
   -r, --printer string      Printer redirection (default "Disable")
   -p, --protected string    Protected client (default "Disable")
+  -u, --tui                 Use the TUI to create a configuration
   -v, --vGpu string         Enable or disable vGPU (default "Disable")
   -i, --video string        Video input (default "Disable")
 ```
+
+*When using the optional TUI interface (`-u`), empty `name` fields will not create the default `sandbox.wsb` file.*
 
 ### Example
 
