@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/aboxofsox/eval v0.0.0-20240707181048-ec49fd91838b // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/x/ansi v0.1.2 // indirect

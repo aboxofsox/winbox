@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"strconv"
 
+	"github.com/aboxofsox/eval"
 	inputs "github.com/aboxofsox/winbox/tui/inputs"
 	"github.com/aboxofsox/winbox/winbox"
 	"github.com/spf13/cobra"
@@ -74,13 +74,14 @@ func createWithTui() {
 	c.AudioInput = m.Inputs[1].Value()
 	c.ClipboardRedirection = m.Inputs[2].Value()
 
-	// it would be nice to handle equations
-	// i.e. 8 * 1024 or 1024 + 1024 + 512
-	// the Shunting Yard algorithm comes to mind
-	mimb, err := strconv.Atoi(m.Inputs[3].Value())
-	if err == nil {
-		c.MemoryInMB = mimb
+	exp := m.Inputs[3].Value()
+	mem, err := eval.Eval(exp)
+	if err != nil {
+		fmt.Println(err)
+		return
+
 	}
+	c.MemoryInMB = mem
 
 	c.Networking = m.Inputs[4].Value()
 	c.PrinterRedirection = m.Inputs[5].Value()
