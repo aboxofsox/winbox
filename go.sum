@@ -1,3 +1,5 @@
+github.com/aboxofsox/eval v0.0.0-20240707181048-ec49fd91838b h1:lXGVRExqSKcs/xJ+fMQeXYxU2b3ysGu6UmdXOVXk5jw=
+github.com/aboxofsox/eval v0.0.0-20240707181048-ec49fd91838b/go.mod h1:7IRoJu4r2ZDvJ5qFEu2tSoMX0yr8J1L7rTwHGNEG4go=
 github.com/atotto/clipboard v0.1.4 h1:EH0zSVneZPSuFR11BlR9YppQTVDbh5+16AmcJi4g1z4=
 github.com/atotto/clipboard v0.1.4/go.mod h1:ZY9tmq7sm5xIbd9bOK4onWV4S6X0u6GY7Vn0Yu86PYI=
 github.com/aymanbagabas/go-osc52/v2 v2.0.1 h1:HwpRHbFMcZLEVr42D4p7XBqjyuxQH5SMiErDT4WkJ2k=
