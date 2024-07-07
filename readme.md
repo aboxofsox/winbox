@@ -73,6 +73,9 @@ Flags:
   -i, --video string        Video input (default "Disable")
 ```
 
+### Expressions
+When allocating memory, you can pass an expression as `Memory in Megabytes` when using the optional TUI.
+
 *When using the optional TUI interface (`-u`), empty `name` fields will not create the default `sandbox.wsb` file.*
 
 ### Example

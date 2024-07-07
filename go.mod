@@ -3,6 +3,7 @@ module github.com/aboxofsox/winbox
 go 1.22.4
 
 require (
+	github.com/aboxofsox/eval v0.0.0-20240707181048-ec49fd91838b
 	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/bubbletea v0.26.6
 	github.com/charmbracelet/lipgloss v0.11.0
@@ -10,7 +11,6 @@ require (
 )
 
 require (
-	github.com/aboxofsox/eval v0.0.0-20240707181048-ec49fd91838b // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/x/ansi v0.1.2 // indirect
