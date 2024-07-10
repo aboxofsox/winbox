@@ -6,6 +6,28 @@ $archs = 'windows/386', 'windows/arm64', 'windows/amd64'
 $previousBuilds = Get-ChildItem '.\bin' -Filter "$packageName-*" -Recurse
 $oldVersionPath = Join-Path -Path '.\old' -ChildPath $version.ToString()
 
+if (-not (Test-Path -Path '.\bin')) {
+        New-Item -ItemType directory -Path '.\bin' -Force | Out-Null
+}
+
+function Invoke-Command {
+        param(
+                [string]$Command,
+                [string]$Arguments
+        )
+        $process = Start-Process -FilePath $Command -ArgumentList $Arguments -PassThru -Wait
+        $process.ExitCode
+}
+
+function Invoke-Download {
+        param(
+                [string]$Url,
+                [string]$Destination
+        )
+        $webClient = New-Object System.Net.WebClient
+        $webClient.DownloadFile($Url, $Destination)
+}
+
 if (-not (Test-Path -Path $oldVersionPath)) {
         New-Item -ItemType directory -Path $oldVersionPath -Force | Out-Null
 }
@@ -23,7 +45,7 @@ foreach ($backup in $backups) {
         }
 }
 
-go mod tidy
+Invoke-Command -Command 'go' -Arguments 'mod tidy' | Out-Null
 
 foreach ($arch in $archs) {
         $arch = $arch.Split('/')[1]
@@ -34,7 +56,7 @@ foreach ($arch in $archs) {
         }
         $env:GOOS = 'windows'
         $env:GOARCH = $arch
-        go build -o "bin/$packageName-$arch-v$($version.ToString()).exe" -ldflags "-X main.version=$version -X main.commit=$commit -X main.date=$date" -v
+        Invoke-Command -Command 'go' -Arguments "build -o bin\$packageName-$arch-v$($version.ToString()).exe -ldflags '-X main.version=$version -X main.commit=$commit -X main.date=$date' -v"
 }
 
 $checksumFile = '.\bin\checksums.txt'
