@@ -1,5 +1,5 @@
 $packageName = 'winbox'
-[version]$version = '0.3.0'
+[version]$version = '0.4.0'
 $commit = (git rev-parse --short HEAD)
 $date = (Get-Date -Format 'yyyy-MM-dd')
 $archs = 'windows/386', 'windows/arm64', 'windows/amd64'
@@ -31,19 +31,12 @@ function Invoke-Download {
 if (-not (Test-Path -Path $oldVersionPath)) {
         New-Item -ItemType directory -Path $oldVersionPath -Force | Out-Null
 }
-$backups = Get-ChildItem $oldVersionPath -Filter '*.bak' -Recurse
 
 foreach ($build in $previousBuilds) {
         $fileName = Split-Path $build.FullName -Leaf
         $destination = Join-Path -Path $oldVersionPath -ChildPath $fileName
         Move-Item -Path $build.FullName -Destination $destination -Force
     }
-
-foreach ($backup in $backups) {
-        if ($backup.LastWriteTime -lt (Get-Date).AddDays(30)) {
-                Remove-Item $backup.FullName -Force
-        }
-}
 
 Invoke-Command -Command 'go' -Arguments 'mod tidy' | Out-Null
 
