@@ -36,10 +36,9 @@ foreach ($build in $previousBuilds) {
         $fileName = Split-Path $build.FullName -Leaf
         $destination = Join-Path -Path $oldVersionPath -ChildPath $fileName
         Move-Item -Path $build.FullName -Destination $destination -Force
-    }
+}
 
-Invoke-Command -Command 'go' -Arguments 'mod tidy' | Out-Null
-
+Start-Process -FilePath 'go' -ArgumentList 'go mod tidy'
 foreach ($arch in $archs) {
         $arch = $arch.Split('/')[1]
         $fullpath = ".\bin\$packageName-$arch-$($version.ToString()).exe"
@@ -49,7 +48,7 @@ foreach ($arch in $archs) {
         }
         $env:GOOS = 'windows'
         $env:GOARCH = $arch
-        Invoke-Command -Command 'go' -Arguments "build -o bin\$packageName-$arch-v$($version.ToString()).exe -ldflags '-X main.version=$version -X main.commit=$commit -X main.date=$date' -v"
+        Start-Process -FilePath 'go' -ArgumentList "build -o bin\$packageName-$arch-v$($version.ToString()).exe -ldflags '-X main.version=$version -X main.commit=$commit -X main.date=$date' -v"
 }
 
 $checksumFile = '.\bin\checksums.txt'
