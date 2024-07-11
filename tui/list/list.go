@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/aboxofsox/winbox/winbox"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -51,9 +50,11 @@ func (d ItemDelegate) Render(w io.Writer, m list.Model, index int, li list.Item)
 }
 
 type Model struct {
-	List     list.Model
-	Choice   string
-	quitting bool
+	List      list.Model
+	title     string
+	submitMsg string
+	Choice    string
+	quitting  bool
 }
 
 func (m Model) Init() tea.Cmd {
@@ -89,32 +90,32 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m Model) View() string {
 	if m.Choice != "" {
-		return QuitTextStyle.Render(fmt.Sprintf("Launching Windows Sandbox with %s configuration.", m.Choice))
+		return QuitTextStyle.Render(m.submitMsg)
 	}
 	if m.quitting {
-		return QuitTextStyle.Render("Quitting")
+		return ""
 	}
 
 	return "\n" + m.List.View()
 }
 
-func Show() {
-	items := make([]list.Item, 0)
-	for _, wsb := range findAllWSBFiles() {
-		items = append(items, Item(wsb))
+func Show(title, submitMsg string, items []string) string {
+	listItems := make([]list.Item, 0)
+	for _, l := range items {
+		listItems = append(listItems, Item(l))
 	}
 
 	const defaultWidth = 20
 
-	l := list.New(items, ItemDelegate{}, defaultWidth, listHeight)
-	l.Title = "Select a Windows Sandbox configuration"
+	l := list.New(listItems, ItemDelegate{}, defaultWidth, listHeight)
+	l.Title = title
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)
 	l.Styles.Title = TitleStyle
 	l.Styles.PaginationStyle = PaginationStyle
 	l.Styles.HelpStyle = HelpStyle
 
-	m := Model{List: l}
+	m := Model{List: l, submitMsg: submitMsg, title: title}
 
 	tm, err := tea.NewProgram(m).Run()
 	if err != nil {
@@ -123,12 +124,14 @@ func Show() {
 	}
 
 	m, _ = tm.(Model)
-	if m.Choice != "" {
-		winbox.Run(m.Choice)
+	if m.Choice == "" {
+		os.Exit(0)
 	}
+
+	return m.Choice
 }
 
-func findAllWSBFiles() []string {
+func FindAllWSBFiles() []string {
 	f, err := os.Open(".")
 	if err != nil {
 		fmt.Println(err.Error())
