@@ -15,7 +15,7 @@ Enable-WindowsOptionalFeature -FeatureName 'Containers-DisposableClientVM' -All 
 ### Example `config.json`
 ```json
 {
-        "windowsSandboxPath": "D:\\Path\\To\****\WindowsSandbox.exe"
+        "windowsSandboxPath": "D:\\Path\\To\\WindowsSandbox\\WindowsSandbox.exe"
 }	
 ```
 
