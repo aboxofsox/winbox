@@ -150,6 +150,15 @@ func (c *Configuration) AddMappedFolder(mf MappedFolder) {
 	c.MappedFolders = append(c.MappedFolders, mf)
 }
 
+func (c *Configuration) RemoveMappedFolder(p string) {
+	for i, mf := range c.MappedFolders {
+		if mf.HostFolder == p {
+			c.MappedFolders = append(c.MappedFolders[:i], c.MappedFolders[i+1:]...)
+			break
+		}
+	}
+}
+
 // AddLogonCommand adds a command to run on startup
 func (c *Configuration) AddLogonCommand(cmd Command) {
 	c.LogonCommand = cmd
