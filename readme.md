@@ -67,14 +67,15 @@ Flags:
   -a, --audio string        Audio input (default "Disable")
   -c, --clipboard string    Clipboard redirection (default "Disable")
   -h, --help                help for create
-  -m, --memory int          Memory in MB (default 8192)
+  -m, --memory string       Memory in MB (default "1024")
   -N, --name string         Name of the Windows Sandbox configuration (default "sandbox")
   -n, --networking string   Networking configuration (default "Default")
   -r, --printer string      Printer redirection (default "Disable")
   -p, --protected string    Protected client (default "Disable")
   -u, --tui                 Use the TUI to create a configuration
-  -v, --vGpu string         Enable or disable vGPU (default "Disable")
-  -i, --video string        Video input (default "Disable")
+  -g, --vGpu string         Enable or disable vGPU (default "Disable")
+  -v, --video string        Video input (default "Disable")
+
 ```
 
 ### Expressions
