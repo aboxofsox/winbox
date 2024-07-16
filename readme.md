@@ -21,7 +21,7 @@ Enable-WindowsOptionalFeature -FeatureName 'Containers-DisposableClientVM' -All 
 
 ## Installing
 ```
-powershell.exe -c 'https://raw.githubusercontent.com/aboxofsox/winbox/v0.4.0/scripts/install.ps1' | iex
+powershell.exe -c 'https://raw.githubusercontent.com/aboxofsox/winbox/main/scripts/install.ps1' | iex
 ```
 
 If you have Go, you can simply do `go install github.com/aboxofsox/winbox`.
