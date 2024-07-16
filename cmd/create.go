@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/aboxofsox/eval"
 	inputs "github.com/aboxofsox/winbox/tui/inputs"
@@ -60,7 +61,11 @@ func createWithoutTui(cmd *cobra.Command) {
 func createWithTui() {
 	c := &winbox.Configuration{}
 
-	tm := inputs.Show(c.Keys())
+	items := make([]string, len(c.Keys()))
+	for i, k := range c.Keys() {
+		items[i] = format(k)
+	}
+	tm := inputs.Show(items)
 	m, ok := tm.(inputs.Model)
 	if !ok {
 		fmt.Println("oh no")
@@ -75,6 +80,9 @@ func createWithTui() {
 	c.ClipboardRedirection = m.Inputs[2].Value()
 
 	exp := m.Inputs[3].Value()
+	if exp == "" {
+		exp = "1024"
+	}
 	mem, err := eval.Eval(exp)
 	if err != nil {
 		fmt.Println(err)
@@ -101,17 +109,46 @@ func createWithTui() {
 	}
 }
 
+func format(s string) string {
+	var res string
+	for i, c := range s {
+		if i == 0 {
+			res += strings.ToUpper(string(c))
+			continue
+		}
+		if isCapital(c) && !isCapital(rune(s[i-1])) {
+			res += " " + string(c)
+		} else {
+			res += string(c)
+		}
+	}
+	return res
+}
+
+func indexOf(s string, r rune) int {
+	for i, c := range s {
+		if c == r {
+			return i
+		}
+	}
+	return -1
+}
+
+func isCapital(s rune) bool {
+	return s >= 'A' && s <= 'Z'
+}
+
 func init() {
 	create.Flags().BoolP("tui", "u", false, "Use the TUI to create a configuration")
 	create.Flags().StringP("name", "N", "sandbox", "Name of the Windows Sandbox configuration")
-	create.Flags().StringP("vGpu", "v", "Disable", "Enable or disable vGPU")
+	create.Flags().StringP("vGpu", "g", "Disable", "Enable or disable vGPU")
 	create.Flags().StringP("networking", "n", "Default", "Networking configuration")
 	create.Flags().StringP("audio", "a", "Disable", "Audio input")
-	create.Flags().StringP("video", "i", "Disable", "Video input")
+	create.Flags().StringP("video", "v", "Disable", "Video input")
 	create.Flags().StringP("protected", "p", "Disable", "Protected client")
 	create.Flags().StringP("printer", "r", "Disable", "Printer redirection")
 	create.Flags().StringP("clipboard", "c", "Disable", "Clipboard redirection")
-	create.Flags().IntP("memory", "m", 8*1024, "Memory in MB")
+	create.Flags().StringP("memory", "m", "1024", "Memory in MB")
 
 	rootCmd.AddCommand(create)
 }

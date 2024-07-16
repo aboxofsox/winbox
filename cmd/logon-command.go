@@ -57,7 +57,12 @@ func logonCommandWithTui() {
 		return
 	}
 
-	c, err := winbox.Load(tm.Inputs[0].Value() + winbox.Ext)
+	name := tm.Inputs[0].Value()
+	if _, err := os.Stat(name + winbox.Ext); os.IsNotExist(err) {
+		fmt.Println("configuration does not exist ", name)
+		return
+	}
+	c, err := winbox.Load(name + winbox.Ext)
 	if err != nil {
 		panic(err)
 	}
@@ -69,6 +74,19 @@ func logonCommandWithTui() {
 	c.AddLogonCommand(winbox.Command{
 		Command: tm.Inputs[1].Value(),
 	})
+
+	f, err := os.Create(name + winbox.Ext)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	defer f.Close()
+
+	if err := c.WriteXML(f); err != nil {
+		fmt.Println(err)
+		return
+
+	}
 }
 
 func init() {

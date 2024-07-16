@@ -5,6 +5,7 @@ import (
 	"os"
 
 	inputs "github.com/aboxofsox/winbox/tui/inputs"
+	clist "github.com/aboxofsox/winbox/tui/list"
 	"github.com/aboxofsox/winbox/winbox"
 	"github.com/spf13/cobra"
 )
@@ -28,6 +29,12 @@ func mapFolderWithoutTui(cmd *cobra.Command) {
 	h, _ := cmd.Flags().GetString("host")
 	s, _ := cmd.Flags().GetString("sandbox")
 	r, _ := cmd.Flags().GetBool("readonly")
+	rm, _ := cmd.Flags().GetBool("remove")
+
+	if rm {
+		removeMappedFolderWithTui(n)
+		return
+	}
 
 	c, err := winbox.Load(n + winbox.Ext)
 	if err != nil {
@@ -82,6 +89,41 @@ func mapFolderWithTui() {
 		SandboxFolder: tm.Inputs[2].Value(),
 		ReadOnly:      isReadOnly(tm.Inputs[3].Value()),
 	})
+
+	f, err := os.Create(tm.Inputs[0].Value() + winbox.Ext)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	if err := c.WriteXML(f); err != nil {
+		panic(err)
+	}
+}
+
+func removeMappedFolderWithTui(name string) {
+	c, err := winbox.Load(name + winbox.Ext)
+	if err != nil {
+		panic(err)
+	}
+
+	var mapped []string
+	for _, mf := range c.MappedFolders {
+		mapped = append(mapped, mf.HostFolder)
+	}
+
+	r := clist.Show("Remove Mapped Folder", "Removing", mapped)
+	c.RemoveMappedFolder(r)
+
+	f, err := os.Create(name + winbox.Ext)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	if err := c.WriteXML(f); err != nil {
+		panic(err)
+	}
 }
 
 func isReadOnly(s string) bool {
@@ -99,6 +141,7 @@ func init() {
 	mapFolder.Flags().StringP("sandbox", "S", "", "Sandbox folder")
 	mapFolder.Flags().BoolP("readonly", "R", false, "Read-only")
 	mapFolder.Flags().BoolP("tui", "u", false, "Use the TUI to map a folder")
+	mapFolder.Flags().BoolP("remove", "r", false, "Remove a mapped folder")
 
 	rootCmd.AddCommand(mapFolder)
 }

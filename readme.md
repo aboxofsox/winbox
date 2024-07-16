@@ -15,11 +15,15 @@ Enable-WindowsOptionalFeature -FeatureName 'Containers-DisposableClientVM' -All 
 ### Example `config.json`
 ```json
 {
-        "windowsSandboxPath": "D:\\Path\\To\\WindowsSandbox.exe"
+        "windowsSandboxPath": "D:\\Path\\To\\WindowsSandbox\\WindowsSandbox.exe"
 }	
 ```
 
 ## Installing
+```
+powershell.exe -c 'https://raw.githubusercontent.com/aboxofsox/winbox/v0.4.0/scripts/install.ps1' | iex
+```
+
 If you have Go, you can simply do `go install github.com/aboxofsox/winbox`.
 
 Otherwise, you will need to download a release, and place it somewhere on your PC. Ideally it would go somewhere that's mapped to `PATH`. 
