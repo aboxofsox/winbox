@@ -49,8 +49,7 @@ foreach ($arch in $archs) {
         }
         $env:GOOS = 'windows'
         $env:GOARCH = $arch
-        # Start-Process -FilePath 'go' -ArgumentList "build -o bin\$packageName-$arch-v$($version.ToString()).exe -ldflags '-X main.version=$version -X main.commit=$commit -X main.date=$date' -v"
-        go build -o ".\bin\$packageName-$arch-$($version.ToString()).exe" -ldflags "-X main.version=$version -X main.commit=$commit -X main.date=$date" -v
+        go build -o ".\bin\$packageName-$arch-v$($version.ToString()).exe" -ldflags "-X main.version=$version -X main.commit=$commit -X main.date=$date" -v
 }
 
 $checksumFile = '.\bin\checksums.txt'
