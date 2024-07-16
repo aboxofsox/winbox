@@ -80,6 +80,9 @@ func createWithTui() {
 	c.ClipboardRedirection = m.Inputs[2].Value()
 
 	exp := m.Inputs[3].Value()
+	if exp == "" {
+		exp = "1024"
+	}
 	mem, err := eval.Eval(exp)
 	if err != nil {
 		fmt.Println(err)
@@ -145,7 +148,7 @@ func init() {
 	create.Flags().StringP("protected", "p", "Disable", "Protected client")
 	create.Flags().StringP("printer", "r", "Disable", "Printer redirection")
 	create.Flags().StringP("clipboard", "c", "Disable", "Clipboard redirection")
-	create.Flags().IntP("memory", "m", 8*1024, "Memory in MB")
+	create.Flags().StringP("memory", "m", "1024", "Memory in MB")
 
 	rootCmd.AddCommand(create)
 }
