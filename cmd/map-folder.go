@@ -49,6 +49,19 @@ func mapFolderWithoutTui(cmd *cobra.Command) {
 		return
 	}
 
+	if strings.Contains(h, "$env:") {
+		h = replaceEnv(h)
+	}
+	if strings.Contains(h, "%") {
+		h = replaceOldEnv(h)
+	}
+	if strings.Contains(s, "$env:") {
+		s = replaceEnv(s)
+	}
+	if strings.Contains(s, "%") {
+		s = replaceOldEnv(s)
+	}
+
 	mf := winbox.MappedFolder{
 		HostFolder:    h,
 		SandboxFolder: s,
