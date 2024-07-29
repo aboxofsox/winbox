@@ -3,31 +3,34 @@
 A small tool to manage [Windows Sandbox]('https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-overview') configurations.
 
 ## Prerequisites
+
 This tool assumes you have installed Windows Sandbox in it's default directory. You can create a `config.json` file in the same directory as the `winbox` executable if you have it installed elsewhere, somehow.
 
 **Windows Sandbox is not available for Windows Home**
 
 To enable Windows Sandbox:
+
 ```powershell
 Enable-WindowsOptionalFeature -FeatureName 'Containers-DisposableClientVM' -All -Online
 ```
 
 ### Example `config.json`
+
 ```json
 {
-        "windowsSandboxPath": "D:\\Path\\To\\WindowsSandbox\\WindowsSandbox.exe"
-}	
+  "windowsSandboxPath": "D:\\Path\\To\\WindowsSandbox\\WindowsSandbox.exe"
+}
 ```
 
 ## Installing
+
 ```
 powershell.exe -c 'https://raw.githubusercontent.com/aboxofsox/winbox/main/scripts/install.ps1' | iex
 ```
 
 If you have Go, you can simply do `go install github.com/aboxofsox/winbox`.
 
-Otherwise, you will need to download a release, and place it somewhere on your PC. Ideally it would go somewhere that's mapped to `PATH`. 
-
+Otherwise, you will need to download a release, and place it somewhere on your PC. Ideally it would go somewhere that's mapped to `PATH`.
 
 ## Basic Usage
 
@@ -79,9 +82,10 @@ Flags:
 ```
 
 ### Expressions
+
 When allocating memory, you can pass an expression as `Memory in Megabytes` when using the optional TUI.
 
-*When using the optional TUI interface (`-u`), empty `name` fields will not create the default `sandbox.wsb` file.*
+_When using the optional TUI interface (`-u`), empty `name` fields will not create the default `sandbox.wsb` file._
 
 ### Example
 
@@ -110,6 +114,11 @@ winbox add-logon -N default -c 'notepad.exe'
 ```
 
 ## `map`
+
+You can pass environment variables as you would in cmd or PowerShell. (i.e. `%USERPROFILE%`, `$env:UserProfile`)
+
+`$SandboxUser` is a special variable that holds the path to the `WDAGUtilityAccount` user folder (`C:\Users\WDAGUtilityAccount`).
+
 
 ```powershell
 Map a folder from the host to Windows Sandbox
@@ -152,5 +161,5 @@ winbox run -N default
 ```
 
 ## `select`
-`select` will open a TUI menu where you can select which Windows Sandbox configuration to use and launches Windows Sandbox.
 
+`select` will open a TUI menu where you can select which Windows Sandbox configuration to use and launches Windows Sandbox.

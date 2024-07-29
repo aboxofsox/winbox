@@ -27,14 +27,8 @@ var create = &cobra.Command{
 
 func createWithoutTui(cmd *cobra.Command) {
 	c := &winbox.Configuration{}
-	c.VGpu, _ = cmd.Flags().GetString("vGpu")
-	c.Networking, _ = cmd.Flags().GetString("networking")
-	c.AudioInput, _ = cmd.Flags().GetString("audio")
-	c.VideoInput, _ = cmd.Flags().GetString("video")
-	c.ProtectedClient, _ = cmd.Flags().GetString("protected")
-	c.PrinterRedirection, _ = cmd.Flags().GetString("printer")
-	c.ClipboardRedirection, _ = cmd.Flags().GetString("clipboard")
-	c.MemoryInMB, _ = cmd.Flags().GetInt("memory")
+
+	mapFlags(c, cmd)
 
 	if _, err := os.Stat("config.json"); !os.IsNotExist(err) {
 		config, err := winbox.LoadWinboxConfig()
@@ -44,6 +38,7 @@ func createWithoutTui(cmd *cobra.Command) {
 		}
 		winbox.WindowsSandboxPath = config.WindowsSandboxPath
 	}
+
 	name, _ := cmd.Flags().GetString("name")
 	f, err := os.Create(name + winbox.Ext)
 	if err != nil {
@@ -72,30 +67,13 @@ func createWithTui() {
 		return
 	}
 
+	mapInputs(c, m)
+
 	n := m.Inputs[0].Value()
 	if n == "" {
+		fmt.Println("configuration requires a name")
 		return
 	}
-	c.AudioInput = m.Inputs[1].Value()
-	c.ClipboardRedirection = m.Inputs[2].Value()
-
-	exp := m.Inputs[3].Value()
-	if exp == "" {
-		exp = "1024"
-	}
-	mem, err := eval.Eval(exp)
-	if err != nil {
-		fmt.Println(err)
-		return
-
-	}
-	c.MemoryInMB = mem
-
-	c.Networking = m.Inputs[4].Value()
-	c.PrinterRedirection = m.Inputs[5].Value()
-	c.ProtectedClient = m.Inputs[6].Value()
-	c.VGpu = m.Inputs[7].Value()
-	c.VideoInput = m.Inputs[8].Value()
 
 	f, err := os.Create(n + winbox.Ext)
 	if err != nil {
@@ -107,6 +85,44 @@ func createWithTui() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func mapInputs(c *winbox.Configuration, m inputs.Model) {
+	c.AudioInput = m.Inputs[1].Value()
+	c.ClipboardRedirection = m.Inputs[2].Value()
+	c.Networking = m.Inputs[4].Value()
+	c.PrinterRedirection = m.Inputs[5].Value()
+	c.ProtectedClient = m.Inputs[6].Value()
+	c.VGpu = m.Inputs[7].Value()
+	c.VideoInput = m.Inputs[8].Value()
+
+	exp := m.Inputs[3].Value()
+	if exp == "" {
+		exp = "1024"
+	}
+	mem, err := valuate(exp)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	c.MemoryInMB = mem
+}
+
+func mapFlags(c *winbox.Configuration, cmd *cobra.Command) {
+	c.AudioInput, _ = cmd.Flags().GetString("audio")
+	c.ClipboardRedirection, _ = cmd.Flags().GetString("clipboard")
+	c.Networking, _ = cmd.Flags().GetString("networking")
+	c.PrinterRedirection, _ = cmd.Flags().GetString("printer")
+	c.ProtectedClient, _ = cmd.Flags().GetString("protected")
+	c.VGpu, _ = cmd.Flags().GetString("vGpu")
+	c.VideoInput, _ = cmd.Flags().GetString("video")
+
+	mem, _ := cmd.Flags().GetInt("memory")
+	c.MemoryInMB = mem
+}
+
+func valuate(exp string) (int, error) {
+	return eval.Eval(exp)
 }
 
 func format(s string) string {

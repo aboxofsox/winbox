@@ -2,12 +2,19 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
+	"regexp"
+	"strings"
 
 	inputs "github.com/aboxofsox/winbox/tui/inputs"
 	clist "github.com/aboxofsox/winbox/tui/list"
 	"github.com/aboxofsox/winbox/winbox"
 	"github.com/spf13/cobra"
+)
+
+var (
+	SandboxAccountPath = "C:\\Users\\WDAGUtilityAccount"
 )
 
 var mapFolder = &cobra.Command{
@@ -84,9 +91,26 @@ func mapFolderWithTui() {
 		panic(err)
 	}
 
+	hostFolder := tm.Inputs[1].Value()
+	sandboxFolder := tm.Inputs[2].Value()
+
+	if strings.Contains(hostFolder, "$env:") {
+		hostFolder = replaceEnv(hostFolder)
+	}
+	if strings.Contains(hostFolder, "%") {
+		hostFolder = replaceOldEnv(hostFolder)
+	}
+
+	if strings.Contains(sandboxFolder, "$SandboxUser") {
+		sandboxFolder = strings.Replace(sandboxFolder, "$SandboxUser", SandboxAccountPath, 1)
+	}
+	if strings.Contains(sandboxFolder, "$env:") {
+		sandboxFolder = replaceEnv(sandboxFolder)
+	}
+
 	c.AddMappedFolder(winbox.MappedFolder{
-		HostFolder:    tm.Inputs[1].Value(),
-		SandboxFolder: tm.Inputs[2].Value(),
+		HostFolder:    hostFolder,
+		SandboxFolder: sandboxFolder,
 		ReadOnly:      isReadOnly(tm.Inputs[3].Value()),
 	})
 
@@ -133,6 +157,55 @@ func isReadOnly(s string) bool {
 	default:
 		return false
 	}
+}
+
+func replaceEnv(s string) string {
+	e := extractEnv(s)
+	v := resolveEnv(e)
+	return strings.ReplaceAll(s, e, v)
+}
+
+func indexesOf(s string, ch rune) (int, int) {
+	var idx []int
+	for i, c := range s {
+		if c == ch {
+			idx = append(idx, i)
+		}
+	}
+	if len(idx) != 2 {
+		return 0, len(s) - 1
+	}
+	return idx[0], idx[1] + 1
+}
+
+func extractOldEnv(s string) string {
+	_s, e := indexesOf(s, '%')
+	return s[_s:e]
+}
+
+func replaceOldEnv(s string) string {
+	e := extractOldEnv(s)
+	v := os.Getenv(strings.ReplaceAll(e, "%", ""))
+	if v == "" {
+		return s
+	}
+	return strings.ReplaceAll(s, e, v)
+}
+
+func resolveEnv(s string) string {
+	parts := strings.Split(s, ":")
+	if len(parts) != 2 {
+		log.Printf("invalid env variable format: %s\nexpected: $env:Name", s)
+		return ""
+	}
+	if parts[0] != "$env" {
+		log.Printf("invalid env variable format; %s\nexpected: $env:Name", s)
+	}
+	return os.Getenv(parts[1])
+}
+
+func extractEnv(s string) string {
+	return regexp.MustCompile(`\$env:[^\\]+`).FindString(s)
 }
 
 func init() {

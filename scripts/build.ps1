@@ -1,13 +1,24 @@
-$packageName = 'winbox'
-[version]$version = '0.4.0'
-$commit = (git rev-parse --short HEAD)
-$date = (Get-Date -Format 'yyyy-MM-dd')
-$archs = 'windows/386', 'windows/arm64', 'windows/amd64'
-$previousBuilds = Get-ChildItem '.\bin' -Filter "$packageName-*" -Recurse
-$oldVersionPath = Join-Path -Path '.\old' -ChildPath $version.ToString()
+param(
+        [string] $PackageName = 'winbox',
+        [version] $Version = (Get-Content -Path '.\VERSION' -Raw),
+        [string] $Commit = (git rev-parse --short HEAD),
+        [string[]] $Archs = @('windows/386', 'windows/arm64', 'windows/amd64'),
+        [switch]$TestBuild = $false
+)
 
-if (-not (Test-Path -Path '.\bin')) {
-        New-Item -ItemType directory -Path '.\bin' -Force | Out-Null
+if (-not (Test-Path -Path 'VERSION'))  {
+        Write-Host 'VERSION file not found' -ForegroundColor Red
+        exit
+}
+
+$date = (Get-Date -Format 'yyyy-MM-dd')
+$bin = '.\bin'
+if ($TestBuild) {
+        $bin = '.\testing'
+}
+
+if (-not (Test-Path -Path $bin)) {
+        New-Item -ItemType directory -Path $bin -Force | Out-Null
 }
 
 function Invoke-Command {
@@ -28,28 +39,18 @@ function Invoke-Download {
         $webClient.DownloadFile($Url, $Destination)
 }
 
-if (-not (Test-Path -Path $oldVersionPath)) {
-        New-Item -ItemType directory -Path $oldVersionPath -Force | Out-Null
-}
-
-foreach ($build in $previousBuilds) {
-        $fileName = Split-Path $build.FullName -Leaf
-        $destination = Join-Path -Path $oldVersionPath -ChildPath $fileName
-        Move-Item -Path $build.FullName -Destination $destination -Force
-}
-
 go mod tidy
 
-foreach ($arch in $archs) {
+foreach ($arch in $Archs) {
         $arch = $arch.Split('/')[1]
-        $fullpath = ".\bin\$packageName-$arch-$($version.ToString()).exe"
+        $fullpath = ".\bin\$PackageName-$arch-$($Version.ToString()).exe"
         if (Test-Path $fullpath) {
-                Write-Host "Build for $arch version $($version.ToString()) already exists.`nPlease update the version." -ForegroundColor Yellow
+                Write-Host "Build for $arch version $($Version.ToString()) already exists.`nPlease update the version." -ForegroundColor Yellow
                 exit
         }
         $env:GOOS = 'windows'
         $env:GOARCH = $arch
-        go build -o ".\bin\$packageName-$arch-v$($version.ToString()).exe" -ldflags "-X main.version=$version -X main.commit=$commit -X main.date=$date" -v
+        go build -o ".\bin\$PackageName-$arch-v$($Version.ToString()).exe" -ldflags "-X main.version=$Version -X main.commit=$Commit -X main.date=$date" -v
 }
 
 $checksumFile = '.\bin\checksums.txt'
@@ -58,7 +59,7 @@ if (-not (Test-Path -Path $checksumFile)) {
 }
 
 $checksums = @()
-Get-ChildItem -Path '.\bin' -Filter "$packageName-*.exe" | ForEach-Object {
+Get-ChildItem -Path $bin -Filter "$PackageName-*.exe" | ForEach-Object {
         $checksum = Get-FileHash -Path $_.FullName -Algorithm SHA256
         $checksums += $checksum.Hash + ' ' + $_.Name
 }
